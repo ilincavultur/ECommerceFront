@@ -1,5 +1,3 @@
-import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import Header from "@/components/Header";
 import Featured from "@/components/Featured";
@@ -10,26 +8,26 @@ import NewProducts from "@/components/NewProducts";
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home({product}) {
-    console.log(product);
+export default function Home({featuredProduct,newProducts}) {
   return (
     <div>
       <Header />
-        <Featured product={product}/>
-        <NewProducts />
+        <Featured product={featuredProduct} />
+        <NewProducts products={newProducts} />
     </div>
-  )
+  );
 }
 
 export async function getServerSideProps() {
     const featuredProductId = '64aeb433c025a33a1d2eb41e';
     await mongooseConnect();
     const featuredProduct = await Product.findById(featuredProductId);
-    const newProducts = await Product.find({}, null, {sort: {'_id':-1}})
+
+    const newProducts = await Product.find({}, null, {sort: {'_id':-1}, limit:10});
     return {
         props: {
-            product: JSON.parse(JSON.stringify(featuredProduct)),
+            featuredProduct: JSON.parse(JSON.stringify(featuredProduct)),
             newProducts: JSON.parse(JSON.stringify(newProducts)),
         },
-    }
+    };
 }
